@@ -35,15 +35,16 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Updated to the latest version
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4  # Updated to the latest version
       with:
         python-version: '3.x'
 
-    - name: Install nbconvert
-      run: pip install nbconvert
+    - name: Install dependencies
+      run: |
+        pip install nbconvert
 
     - name: Extract Python code from Jupyter notebooks
       run: |
@@ -57,8 +58,13 @@ jobs:
         languages: ${{ matrix.language }}
         queries: +security-and-quality
 
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2  # Automatically builds the project to prepare for analysis
+      continue-on-error: true  # Continue if the autobuild step fails, as it might be non-blocking
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
-        category: "/language:${{matrix.language}}"
+        category: "/language:${{ matrix.language }}"
+
 
